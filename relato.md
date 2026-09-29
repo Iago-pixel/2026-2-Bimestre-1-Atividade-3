@@ -88,17 +88,69 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+Ex-1:
+> A primeira linha desse código permite que o program faço o importe de uma classe do pacote nativo que gera números aleatórios.
+> Após isso é criada a função "produzirDados" que indica o retorno de uma lista de números inteiros.
 
-FIXME
-> explicar como foi executado
-> mostrar as saídas do terminal
-> mostrar as saídas do terminal
+> <img width="302" height="47" alt="image" src="https://github.com/user-attachments/assets/b2df1b85-d802-4012-9f4d-2cd46574fb20" />
 
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+> Temos, então, o bloco dentro das chaves é executado 100 vezes (uma para cada elemento da lista). A cada repetição, Random.nextInt(0, 111) gera um inteiro aleatório no intervalo de 0 a 110 (o limite 111 é exclusivo).
+> Após isso, temos a função "consumirDados" que realiza uma operação de soma de todos os valores recebidos na lista e gera o resultado.
+
+> <img width="257" height="47" alt="image" src="https://github.com/user-attachments/assets/f915aae2-9f29-464f-8355-4a33d24cbafa" />
+
+> Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atirbui a lista a variavel "dados" após isso faz a chamada para afunçaõ seguinte que a realiza a operação já mencionada.
+
+
+Ex-2:
+> A linha 1 e 2 são importes para ferramentas que vamos usar no código, a primeira serve para as corotinas em kotlin e a segunda é uma classe de geração de número aleatório que usaremos na lista que iremos criar:
+
+> <img width="262" height="45" alt="image" src="https://github.com/user-attachments/assets/84c24927-00ea-4b37-ad87-aa2f9c966427" />
+
+> Após isso é criada a variável que irá guardar a lista de números, em seguida definimos uma função para que os valores da lista gerados sejam armazenados na variavel, com respectivos "printl" para indicar o processo sendo realizado.
+> Após isso, criamos outra função "consumirDados" que iremos usar para realizar operações, no caso do exemplo a soma de todos os números da lista que foi criada e armazenada.
+
+> <img width="226" height="31" alt="image" src="https://github.com/user-attachments/assets/6fe62279-245a-405f-9137-e030389ca7d0" />
+
+> Por fim, há a função principal "main" que usa o runBlocking. O runBlocking bloqueia a thread principal até que todas as corrotinas criadas dentro do seu bloco terminem de executar. Dentro dele temos as execuções e chamadas das funções anteriores também.
+
+Ex-3:
+>
+
+ 
+> Ex-1 código:
+> <img width="327" height="627" alt="image" src="https://github.com/user-attachments/assets/bafc0802-9900-495f-808c-2e0f36bfea12" />
+
+> Ex-2 código:
+> <img width="607" height="827" alt="image" src="https://github.com/user-attachments/assets/4ec92b3e-38b6-4894-950b-76cbed5d980e" />
+
+> Ex-3 código:
+
+Execução:
+> O programa começa a rodar, imprime "iniciou" na tela e ativa o runBlocking. O runBlocking funciona como o Gerente mantendo as portas abertas: o programa não encerra enquanto as tarefas internas não terminarem.
+> O Produtor é acionado para criar a lista. Ele sorteia 100 números inteiros aleatórios (entre 0 e 110) e guarda essa lista na memória.
+> O "join" faz uma pausa e obriga o Consumidor a esperar até que o Produtor termine 100% de preencher a lista. Essa ordem é crucial para impedir que o Consumidor tente ler uma lista ainda vazia.
+> Com a lista devidamente preenchida, o Consumidor entra em ação. Ele lê os 100 números, faz o somatório de todos os valores (.sum()) e imprime o resultado formatado no console.
+> O programa confirma que o Consumidor também terminou o seu trabalho, imprime "finalizou" na tela e fecha o programa com segurança.
+
+
+> Saida Ex-1:
+
+> <img width="1122" height="88" alt="image" src="https://github.com/user-attachments/assets/81eb2014-6989-4407-a645-2411cf1140a7" />
+
+> Saida Ex-2:
+
+> <img width="1600" height="256" alt="image" src="https://github.com/user-attachments/assets/40d7e33d-5e72-47b1-8e31-697992076595" />
+
+
+Até agora, vimos nossas tarefas rodando no mesmo processo, onde threads ou corrotinas compartilham a mesma memória RAM. Mas e se a função produzirDados rodar em um programa e a consumirDados rodar em outro completamente separado?
+
+Para entregar nossa lista de 100 números, precisamos usar o próprio Sistema Operacional para intermediar essa mensagem. Podemos fazer isso de algumas formas, o que citaremos é socket:
+
+    Usando Sockets Locais, transmitindo os dados via rede interna do computador;
+
+O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma variável compartilhada na memória, entre processos nós precisamos serializar e transmitir essa informação.
+
 
 ### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
