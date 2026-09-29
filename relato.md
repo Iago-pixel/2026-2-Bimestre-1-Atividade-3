@@ -88,35 +88,52 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+#### O código
 
-FIXME
-> explicar como foi executado
-> mostrar as saídas do terminal
-> mostrar as saídas do terminal
+> O arquivo `consumidor.kt` utiliza Coroutines (`kotlinx.coroutines`), que são alternativas mais leves às threads, para realizar a comunicação concorrente.
 
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+> Uma lista global mutável chamada `dados` é compartilhada. A função `produzirDados` preenche essa lista, e `consumirDados` realiza a soma.
 
-### Comunicação entre tarefas em processos diferentes em computadores diferentes
+> Na função principal, usamos `runBlocking` e `launch` para disparar as tarefas. O comando `jobProdutor.join()` obriga o consumidor a esperar a produção terminar, evitando erros de leitura antes do tempo.
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+```kotlin
+import kotlinx.coroutines.*
+import kotlin.random.Random
 
-FIXME
-> explicar como foi executado
-> mostrar as saídas do terminal
-> mostrar as saídas do terminal
+var dados = mutableListOf<Int>()
 
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+fun produzirDados() {
+    println("# produzir - iniciado")
+    dados = List(100) { Random.nextInt(0, 111) }.toMutableList()
+    println("# produzir $dados")
+    println("# produzir - terminado")
+}
 
-## Considerações finais
+fun consumirDados() {
+    println("### consumir - iniciado")
+    println("### dados -> $dados")
+    val resultado = dados.sum()
+    println("### resultado -> $resultado")
+    println("### consumir - terminado")
+}
 
-FIXME
-> conseguiu implementar tudo e executar?
-> qual foi o aprendizado nesse trabalho?
-> alguma recomendação para próximos alunos?
+fun main() = runBlocking {
+    println("iniciou")
+
+    val jobProdutor = launch {
+        produzirDados()
+    }
+
+    jobProdutor.join()
+
+    val jobConsumidor = launch {
+        consumirDados()
+    }
+    jobConsumidor.join()
+
+    println("finalizou")
+}
+
+Execução
+
+O código foi compilado e executado via Docker. O terminal confirma que a rotina de consumo aguardou corretamente a produção dos dados antes de exibir o resultado.
