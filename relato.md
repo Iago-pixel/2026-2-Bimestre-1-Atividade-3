@@ -4,11 +4,11 @@
 
 Este relato faz parte do processo avaliativo da disciplina de sistemas operacionas no curso superior em análise e desenvolvimento de sistemas, ofertado na Diretoria acadêmica de gestão e tecnologia da informação no campus natal-central do instituto federal de educação, ciência e tecnologia do rio grande do norte.
 
-Tem como objetivo principal relatar as implementações de comunicação entre tarefas na linguagem FIXME.
+Tem como objetivo principal relatar as implementações de comunicação entre tarefas na linguagem Kotlin.
 
-O grupo de trabalho foi formado por FIXME.
+O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Vinícius Souza de Sales e Valentine Varela.
 
-## Comunicação entre tarefas em FIXME
+## Comunicação entre tarefas em Kotlin
 
 ### Informações gerais
 
