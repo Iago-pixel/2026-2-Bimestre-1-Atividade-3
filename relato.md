@@ -114,17 +114,12 @@ Ex-2:
 
 > Por fim, há a função principal "main" que usa o runBlocking. O runBlocking bloqueia a thread principal até que todas as corrotinas criadas dentro do seu bloco terminem de executar. Dentro dele temos as execuções e chamadas das funções anteriores também.
 
-Ex-3:
->
-
  
 > Ex-1 código:
 > <img width="327" height="627" alt="image" src="https://github.com/user-attachments/assets/bafc0802-9900-495f-808c-2e0f36bfea12" />
 
 > Ex-2 código:
 > <img width="607" height="827" alt="image" src="https://github.com/user-attachments/assets/4ec92b3e-38b6-4894-950b-76cbed5d980e" />
-
-> Ex-3 código:
 
 Execução:
 > O programa começa a rodar, imprime "iniciou" na tela e ativa o runBlocking. O runBlocking funciona como o Gerente mantendo as portas abertas: o programa não encerra enquanto as tarefas internas não terminarem.
