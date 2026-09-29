@@ -134,6 +134,20 @@ fun main() = runBlocking {
     println("finalizou")
 }
 
-Execução
+#### Execução
 
-O código foi compilado e executado via Docker. O terminal confirma que a rotina de consumo aguardou corretamente a produção dos dados antes de exibir o resultado.
+> Para a execução, o Servidor é iniciado primeiro. Assim que o Cliente se conecta via IP e porta, a transferência de dados ocorre com sucesso.
+
+#### Problemas enfrentados
+> O principal entrave foi o isolamento de rede do Docker, que bloqueia conexões externas por padrão. A solução é usar a flag -p 12345:12345 ao rodar o container para mapear a porta e liberar o acesso.
+
+## Considerações finais
+> O grupo conseguiu implementar e executar com sucesso todas as atividades, adaptando a lógica de concorrência para as ferramentas nativas do Kotlin.
+
+> O maior aprendizado foi entender o uso de Coroutines e consolidar os conhecimentos em Docker, destacando a técnica de multi-stage build que separou a compilação da execução do projeto.
+
+> Para próximos alunos, recomendamos configurar o Docker logo no início para evitar problemas de versão entre as máquinas, e ler atentamente a documentação de Coroutines, já que a lógica de sincronização difere de Threads tradicionais.
+
+
+
+
