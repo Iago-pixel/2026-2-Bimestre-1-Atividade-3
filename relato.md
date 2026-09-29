@@ -1,4 +1,4 @@
-# Relatório sobre implementação de comunicação entre tarefas em FIXME
+# Relatório sobre implementação de comunicação entre tarefas em Kotlin
 
 ## Introdução
 
@@ -12,7 +12,8 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 
 ### Informações gerais
 
-FIXME
+A comunicação entre tarefas em Kotlin é o processo de permitir que diferentes tarefas, especialmente coroutines, troquem informações e coordenem suas execuções. Uma tarefa pode produzir informações enquanto outra recebe e processa esses dados, permitindo criar programas concorrentes.
+
 > qual o objetivo de comunicação entre tarefas? 
 
 FIXME
