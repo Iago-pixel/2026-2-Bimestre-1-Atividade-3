@@ -1,4 +1,4 @@
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 import kotlin.random.Random
 
 var dados = mutableListOf<Int>()
@@ -18,23 +18,19 @@ fun consumirDados() {
     println("### consumir - terminado")
 }
 
-fun principal() {
+fun main() = runBlocking {
     println("iniciou")
 
-    val threadProdutor = thread {
+    val jobProdutor = launch {
         produzirDados()
     }
 
-    val threadConsumidor = thread {
+    jobProdutor.join()
+
+    val jobConsumidor = launch {
         consumirDados()
     }
-
-    threadProdutor.join()
-    threadConsumidor.join()
+    jobConsumidor.join()
 
     println("finalizou")
-}
-
-fun main() {
-    principal()
 }
