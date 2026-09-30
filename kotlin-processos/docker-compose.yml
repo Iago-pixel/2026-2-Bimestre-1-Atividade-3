@@ -1,0 +1,11 @@
+services:
+
+  processo-b:
+    build: ./processo-b
+    container_name: processo-b
+
+  processo-a:
+    build: ./processo-a
+    container_name: processo-a
+    depends_on:
+      - processo-b
