@@ -152,17 +152,104 @@ O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma
 
 ### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+#### O código
 
-FIXME
-> explicar como foi executado
-> mostrar as saídas do terminal
-> mostrar as saídas do terminal
+> O projeto demonstra a comunicação entre dois processos independentes utilizando Kotlin, Docker e TCP Socket.
 
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+> O Processo A é responsável por gerar uma lista com 100 números aleatórios. Depois, ele cria um Socket e se conecta ao Processo B através da porta 5000. A lista é convertida para texto e enviada pela conexão TCP.
+
+> O Processo B funciona como servidor. Ele utiliza ServerSocket(5000) para ficar aguardando uma conexão. Quando o Processo A se conecta, B recebe os dados, transforma a mensagem novamente em uma lista de números e calcula a soma.
+
+> O Docker Compose cria e conecta os dois containers em uma rede interna. Dessa forma, o Processo A consegue encontrar o Processo B pelo nome processo-b.
+
+> Assim, o projeto mostra como dois processos separados podem trocar informações pela rede sem compartilhar diretamente a memória, simulando a comunicação entre dois computadores.
+
+##### Processo-a
+
+```kotlin
+import java.net.Socket
+import kotlin.random.Random
+
+fun produzirDados(): List<Int> {
+    return List(100) {
+        Random.nextInt(0, 111)
+    }
+}
+
+fun main() {
+
+    val dados = produzirDados()
+
+    println("Processo A produziu:")
+    println(dados)
+
+    val socket = Socket("processo-b", 5000)
+
+    println("Processo A: conectado ao Processo B!")
+
+    val mensagem = dados.joinToString(",")
+
+    val writer = socket
+        .getOutputStream()
+        .bufferedWriter()
+
+    writer.write(mensagem)
+    writer.newLine()
+    writer.flush()
+
+    println("Processo A: dados enviados!")
+
+    socket.close()
+}
+```
+
+#### processo-b
+```kotlin
+import java.net.ServerSocket
+
+fun main() {
+    val server = ServerSocket(5000)
+
+    println("Processo B: aguardando conexão do Processo A...")
+
+    val socket = server.accept()
+
+    println("Processo B: Processo A conectado!")
+
+    val mensagem = socket
+        .getInputStream()
+        .bufferedReader()
+        .readLine()
+
+    val dados = mensagem
+        .split(",")
+        .map { it.toInt() }
+
+    println("Processo B recebeu:")
+    println(dados)
+
+    val soma = dados.sum()
+
+    println("Soma dos dados: $soma")
+
+    socket.close()
+    server.close()
+}
+```
+
+### Execução
+
+> A execução do projeto aconteceu através do Docker Compose, que foi responsável por criar e executar os dois processos em containers separados. O Docker executou os dois programas separadamente, enquanto o TCP Socket foi responsável por fazer a comunicação entre eles.
+
+![Saída do terminal](src/img/codigo_pcs_diferentes.png)
+
+### Problemas enfrentados
+
+> Ao implementar a comunicação utilizando Redis, os dados enviados pelo Processo A não foram recebidos corretamente pelo Processo B. Em vez dos 100 números, o Processo B recebeu apenas um valor, mostrando que a comunicação com o protocolo do Redis estava sendo feita de forma incorreta.
+
+> Também tivemos problemas de sincronização, pois o Processo B poderia tentar buscar os dados antes que o Processo A tivesse enviado.
+
+> Para simplificar o projeto e evitar esses problemas, substituímos o Redis por uma comunicação direta utilizando TCP Socket. Assim, o Processo B fica aguardando uma conexão e o Processo A envia diretamente os dados para ele.
 
 ## Considerações finais
 
