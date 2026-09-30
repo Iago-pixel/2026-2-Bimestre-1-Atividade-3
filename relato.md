@@ -133,6 +133,7 @@ fun main() = runBlocking {
 
     println("finalizou")
 }
+```
 
 #### Execução
 
