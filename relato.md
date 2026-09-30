@@ -88,6 +88,8 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
+#### O código
+
 Ex-1:
 > A primeira linha desse código permite que o program faço o importe de uma classe do pacote nativo que gera números aleatórios.
 > Após isso é criada a função "produzirDados" que indica o retorno de uma lista de números inteiros.
@@ -147,23 +149,65 @@ Para entregar nossa lista de 100 números, precisamos usar o próprio Sistema Op
 O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma variável compartilhada na memória, entre processos nós precisamos serializar e transmitir essa informação.
 
 
-### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+> O arquivo `consumidor.kt` utiliza Coroutines (`kotlinx.coroutines`), que são alternativas mais leves às threads, para realizar a comunicação concorrente.
 
-FIXME
-> explicar como foi executado
-> mostrar as saídas do terminal
-> mostrar as saídas do terminal
+> Uma lista global mutável chamada `dados` é compartilhada. A função `produzirDados` preenche essa lista, e `consumirDados` realiza a soma.
 
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+> Na função principal, usamos `runBlocking` e `launch` para disparar as tarefas. O comando `jobProdutor.join()` obriga o consumidor a esperar a produção terminar, evitando erros de leitura antes do tempo.
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlin.random.Random
+
+var dados = mutableListOf<Int>()
+
+fun produzirDados() {
+    println("# produzir - iniciado")
+    dados = List(100) { Random.nextInt(0, 111) }.toMutableList()
+    println("# produzir $dados")
+    println("# produzir - terminado")
+}
+fun consumirDados() {
+    println("### consumir - iniciado")
+    println("### dados -> $dados")
+    val resultado = dados.sum()
+    println("### resultado -> $resultado")
+    println("### consumir - terminado")
+}
+
+fun main() = runBlocking {
+    println("iniciou")
+
+    val jobProdutor = launch {
+        produzirDados()
+    }
+
+    jobProdutor.join()
+
+    val jobConsumidor = launch {
+        consumirDados()
+    }
+    jobConsumidor.join()
+
+    println("finalizou")
+}
+```
+
+#### Execução
+
+> Para a execução, o Servidor é iniciado primeiro. Assim que o Cliente se conecta via IP e porta, a transferência de dados ocorre com sucesso.
+
+#### Problemas enfrentados
+> O principal entrave foi o isolamento de rede do Docker, que bloqueia conexões externas por padrão. A solução é usar a flag -p 12345:12345 ao rodar o container para mapear a porta e liberar o acesso.
 
 ## Considerações finais
+> O grupo conseguiu implementar e executar com sucesso todas as atividades, adaptando a lógica de concorrência para as ferramentas nativas do Kotlin.
 
-FIXME
-> conseguiu implementar tudo e executar?
-> qual foi o aprendizado nesse trabalho?
-> alguma recomendação para próximos alunos?
+> O maior aprendizado foi entender o uso de Coroutines e consolidar os conhecimentos em Docker, destacando a técnica de multi-stage build que separou a compilação da execução do projeto.
+
+> Para próximos alunos, recomendamos configurar o Docker logo no início para evitar problemas de versão entre as máquinas, e ler atentamente a documentação de Coroutines, já que a lógica de sincronização difere de Threads tradicionais.
+
+
+
+
