@@ -54,7 +54,31 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
               │ java -jar        │
               └──────────────────┘
 
-![Código do arquivo Dockerfile](src/img/dockerfile.png)
+```Dockerfile
+FROM eclipse-temurin:17-jdk AS builder
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y wget unzip && \
+    wget https://github.com/JetBrains/kotlin/releases/download/v1.9.23/kotlin-compiler-1.9.23.zip && \
+    unzip kotlin-compiler-1.9.23.zip -d /opt && \
+    rm kotlin-compiler-1.9.23.zip
+
+ENV PATH="/opt/kotlinc/bin:${PATH}"
+
+COPY src/kotlin/sequencial.kt .
+
+RUN kotlinc sequencial.kt -include-runtime -d programa.jar
+
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+COPY --from=builder /app/programa.jar .
+
+CMD ["java", "-jar", "programa.jar"]
+```
 
 ### Comunicação entre tarefas com linhas de execução no mesmo processo
 
@@ -64,17 +88,49 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 
 > Após isso é criada a função "produziDados" que indica o retorno de uma lista de números inteiros.
 
-<img width="302" height="47" alt="image" src="https://github.com/user-attachments/assets/b2df1b85-d802-4012-9f4d-2cd46574fb20" />
+```kotlin
+fun produzirDados(): List<Int> {
+```
 
 > Temos, então, o bloco dentro das chaves é executado 100 vezes (uma para cada elemento da lista). A cada repetição, Random.nextInt(0, 111) gera um inteiro aleatório no intervalo de 0 a 110 (o limite 111 é exclusivo).
 
 > Após isso, temos a função "consumirDados" que realiza uma operação de soma de todos os valores recebidos na lista e gera o resultado que é colocado no terminal.
 
-<img width="257" height="47" alt="image" src="https://github.com/user-attachments/assets/f915aae2-9f29-464f-8355-4a33d24cbafa" />
+```kotlin
+val resultado = dados.sum()
+```
 
 > Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atirbui a lista a variavel "dados" após isso faz a chamada para afunção seguinte que realiza a operação já mencionada. Ela coloca no terminal o inicio e o fim do processo.
 
-![Código do arquivo sequencial.kt](src/img/codigo_sequencial.png)
+```kotlin
+import kotlin.random.Random
+
+fun produzirDados(): List<Int> {
+    val dados = List(100) {
+        Random.nextInt(0, 111)
+    }
+
+    return dados
+}
+
+fun consumirDados(dados: List<Int>) {
+    val resultado = dados.sum()
+    println("recebeu -> $resultado")
+}
+
+fun principal() {
+    println("iniciou")
+
+    val dados = produzirDados()
+    consumirDados(dados)
+
+    println("finalizou")
+}
+
+fun main() {
+    principal()
+}
+```
 
 #### Execução
 
@@ -94,12 +150,16 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 > A primeira linha desse código permite que o program faço o importe de uma classe do pacote nativo que gera números aleatórios.
 > Após isso é criada a função "produzirDados" que indica o retorno de uma lista de números inteiros.
 
-<img width="302" height="47" alt="image" src="https://github.com/user-attachments/assets/b2df1b85-d802-4012-9f4d-2cd46574fb20" />
+```kotlin
+fun produzirDados(): List<Int> {
+```
 
 > Temos, então, o bloco dentro das chaves é executado 100 vezes (uma para cada elemento da lista). A cada repetição, Random.nextInt(0, 111) gera um inteiro aleatório no intervalo de 0 a 110 (o limite 111 é exclusivo).
 > Após isso, temos a função "consumirDados" que realiza uma operação de soma de todos os valores recebidos na lista e gera o resultado.
 
-<img width="257" height="47" alt="image" src="https://github.com/user-attachments/assets/f915aae2-9f29-464f-8355-4a33d24cbafa" />
+```kotlin
+val resultado = dados.sum()
+```
 
 > Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atirbui a lista a variavel "dados" após isso faz a chamada para afunçaõ seguinte que a realiza a operação já mencionada.
 
@@ -107,29 +167,102 @@ O grupo de trabalho foi formado por Ana Letícia Vidal de Oliveira, Iago Viníci
 ##### Ex-2:
 > A linha 1 e 2 são importes para ferramentas que vamos usar no código, a primeira serve para as corotinas em kotlin e a segunda é uma classe de geração de número aleatório que usaremos na lista que iremos criar:
 
-<img width="262" height="45" alt="image" src="https://github.com/user-attachments/assets/84c24927-00ea-4b37-ad87-aa2f9c966427" />
+```kotlin
+import kotlin.random.Random
+```
 
 > Após isso é criada a variável que irá guardar a lista de números, em seguida definimos uma função para que os valores da lista gerados sejam armazenados na variavel, com respectivos "printl" para indicar o processo sendo realizado.
 > Após isso, criamos outra função "consumirDados" que iremos usar para realizar operações, no caso do exemplo a soma de todos os números da lista que foi criada e armazenada.
 
-<img width="226" height="31" alt="image" src="https://github.com/user-attachments/assets/6fe62279-245a-405f-9137-e030389ca7d0" />
+```kotlin
+resultado = dados.sum()
+```
 
 > Por fim, há a função principal "main" que usa o runBlocking. O runBlocking bloqueia a thread principal até que todas as corrotinas criadas dentro do seu bloco terminem de executar. Dentro dele temos as execuções e chamadas das funções anteriores também.
 
  
 ##### Ex-1 código:
 
-<img width="327" height="627" alt="image" src="https://github.com/user-attachments/assets/bafc0802-9900-495f-808c-2e0f36bfea12" />
+```kotlin
+import kotlin.random.Random
+
+fun produzirDados(): List<Int> {
+    val dados = List(100) {
+        Random.nextInt(0, 111)
+    }
+
+    return dados
+}
+
+fun consumirDados(dados: List<Int>) {
+    val resultado = dados.sum()
+    println("recebeu -> $resultado")
+}
+
+fun principal() {
+    println("iniciou")
+
+    val dados = produzirDados()
+    consumirDados(dados)
+
+    println("finalizou")
+}
+
+fun main() {
+    principal()
+}
+```
 
 ##### Ex-2 código:
 
-<img width="607" height="827" alt="image" src="https://github.com/user-attachments/assets/4ec92b3e-38b6-4894-950b-76cbed5d980e" />
+```kotlin
+import kotlinx.coroutines.*
+import kotlin.random.Random
+
+var dados = mutableListOf<Int>()
+
+fun produzirDados() {
+    println("# produzir - iniciado")
+    dados = List(100) { Random.nextInt(0, 111) }.toMutableList()
+    println("# produzir $dados")
+    println("# produzir - terminado")
+}
+
+fun consumirDados() {
+    println("### consumir - iniciado")
+    println("### dados -> $dados")
+    val resultado = dados.sum()
+    println("### resultado -> $resultado")
+    println("### consumir - terminado")
+}
+
+fun main() = runBlocking {
+    println("iniciou")
+
+    val jobProdutor = launch {
+        produzirDados()
+    }
+
+    jobProdutor.join()
+
+    val jobConsumidor = launch {
+        consumirDados()
+    }
+    jobConsumidor.join()
+
+    println("finalizou")
+}
+```
 
 Execução:
 > O programa começa a rodar, imprime "iniciou" na tela e ativa o runBlocking. O runBlocking funciona como o Gerente mantendo as portas abertas: o programa não encerra enquanto as tarefas internas não terminarem.
+
 > O Produtor é acionado para criar a lista. Ele sorteia 100 números inteiros aleatórios (entre 0 e 110) e guarda essa lista na memória.
+
 > O "join" faz uma pausa e obriga o Consumidor a esperar até que o Produtor termine 100% de preencher a lista. Essa ordem é crucial para impedir que o Consumidor tente ler uma lista ainda vazia.
+
 > Com a lista devidamente preenchida, o Consumidor entra em ação. Ele lê os 100 números, faz o somatório de todos os valores (.sum()) e imprime o resultado formatado no console.
+
 > O programa confirma que o Consumidor também terminou o seu trabalho, imprime "finalizou" na tela e fecha o programa com segurança.
 
 
@@ -142,114 +275,27 @@ Execução:
 <img width="1600" height="256" alt="image" src="https://github.com/user-attachments/assets/40d7e33d-5e72-47b1-8e31-697992076595" />
 
 
-Até agora, vimos nossas tarefas rodando no mesmo processo, onde threads ou corrotinas compartilham a mesma memória RAM. Mas e se a função produzirDados rodar em um programa e a consumirDados rodar em outro completamente separado?
+> Até agora, vimos nossas tarefas rodando no mesmo processo, onde threads ou corrotinas compartilham a mesma memória RAM. Mas e se a função produzirDados rodar em um programa e a consumirDados rodar em outro completamente separado?
 
-Para entregar nossa lista de 100 números, precisamos usar o próprio Sistema Operacional para intermediar essa mensagem. Podemos fazer isso de algumas formas, o que citaremos é socket:
+> Para entregar nossa lista de 100 números, precisamos usar o próprio Sistema Operacional para intermediar essa mensagem. Podemos fazer isso de algumas formas, o que citaremos é socket:
 
     Usando Sockets Locais, transmitindo os dados via rede interna do computador;
 
-O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma variável compartilhada na memória, entre processos nós precisamos serializar e transmitir essa informação.
+> O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma variável compartilhada na memória, entre processos nós precisamos serializar e transmitir essa informação.
 
 ### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
-#### O código
+FIXME
+> texto explicando o código
+> mostrar o código completo
 
-> O projeto demonstra a comunicação entre dois processos independentes utilizando Kotlin, Docker e TCP Socket.
+FIXME
+> explicar como foi executado
+> mostrar as saídas do terminal
+> mostrar as saídas do terminal
 
-> O Processo A é responsável por gerar uma lista com 100 números aleatórios. Depois, ele cria um Socket e se conecta ao Processo B através da porta 5000. A lista é convertida para texto e enviada pela conexão TCP.
-
-> O Processo B funciona como servidor. Ele utiliza ServerSocket(5000) para ficar aguardando uma conexão. Quando o Processo A se conecta, B recebe os dados, transforma a mensagem novamente em uma lista de números e calcula a soma.
-
-> O Docker Compose cria e conecta os dois containers em uma rede interna. Dessa forma, o Processo A consegue encontrar o Processo B pelo nome processo-b.
-
-> Assim, o projeto mostra como dois processos separados podem trocar informações pela rede sem compartilhar diretamente a memória, simulando a comunicação entre dois computadores.
-
-##### Processo-a
-
-```kotlin
-import java.net.Socket
-import kotlin.random.Random
-
-fun produzirDados(): List<Int> {
-    return List(100) {
-        Random.nextInt(0, 111)
-    }
-}
-
-fun main() {
-
-    val dados = produzirDados()
-
-    println("Processo A produziu:")
-    println(dados)
-
-    val socket = Socket("processo-b", 5000)
-
-    println("Processo A: conectado ao Processo B!")
-
-    val mensagem = dados.joinToString(",")
-
-    val writer = socket
-        .getOutputStream()
-        .bufferedWriter()
-
-    writer.write(mensagem)
-    writer.newLine()
-    writer.flush()
-
-    println("Processo A: dados enviados!")
-
-    socket.close()
-}
-```
-
-#### processo-b
-```kotlin
-import java.net.ServerSocket
-
-fun main() {
-    val server = ServerSocket(5000)
-
-    println("Processo B: aguardando conexão do Processo A...")
-
-    val socket = server.accept()
-
-    println("Processo B: Processo A conectado!")
-
-    val mensagem = socket
-        .getInputStream()
-        .bufferedReader()
-        .readLine()
-
-    val dados = mensagem
-        .split(",")
-        .map { it.toInt() }
-
-    println("Processo B recebeu:")
-    println(dados)
-
-    val soma = dados.sum()
-
-    println("Soma dos dados: $soma")
-
-    socket.close()
-    server.close()
-}
-```
-
-### Execução
-
-> A execução do projeto aconteceu através do Docker Compose, que foi responsável por criar e executar os dois processos em containers separados. O Docker executou os dois programas separadamente, enquanto o TCP Socket foi responsável por fazer a comunicação entre eles.
-
-![Saída do terminal](src/img/codigo_pcs_diferentes.png)
-
-### Problemas enfrentados
-
-> Ao implementar a comunicação utilizando Redis, os dados enviados pelo Processo A não foram recebidos corretamente pelo Processo B. Em vez dos 100 números, o Processo B recebeu apenas um valor, mostrando que a comunicação com o protocolo do Redis estava sendo feita de forma incorreta.
-
-> Também tivemos problemas de sincronização, pois o Processo B poderia tentar buscar os dados antes que o Processo A tivesse enviado.
-
-> Para simplificar o projeto e evitar esses problemas, substituímos o Redis por uma comunicação direta utilizando TCP Socket. Assim, o Processo B fica aguardando uma conexão e o Processo A envia diretamente os dados para ele.
+FIXME
+> se houve problema na execução, enumerar os problemas e suas respectivas soluções
 
 ## Considerações finais
 
