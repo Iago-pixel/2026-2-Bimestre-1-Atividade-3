@@ -67,7 +67,3 @@ FIXME
 > conseguiu implementar tudo e executar?
 > qual foi o aprendizado nesse trabalho?
 > alguma recomendação para próximos alunos?
-
-
-
-
