@@ -80,7 +80,7 @@ COPY --from=builder /app/programa.jar .
 CMD ["java", "-jar", "programa.jar"]
 ```
 
-### Comunicação entre tarefas com linhas de execução no mesmo processo
+### Sem uso de tarefas
 
 #### O código
 
@@ -142,7 +142,7 @@ fun main() {
 
 > Unico problema enfretado foi que o Docker não encontrou a imagem zenika/kotlin:1.9-jdk17, que é uma imagem que já vem com o kotlin. Foi então necessário usar uma imagem oficial do Java e configurar nela o compilador do kotlin.
 
-### Comunicação entre tarefas em processos diferentes no mesmo computador
+### Comunicação entre tarefas com linhas de execução no mesmo processo
 
 #### O código
 
@@ -282,6 +282,20 @@ Execução:
     Usando Sockets Locais, transmitindo os dados via rede interna do computador;
 
 > O ponto central para guardar é esse: enquanto em threads a gente apenas lê uma variável compartilhada na memória, entre processos nós precisamos serializar e transmitir essa informação.
+
+### Comunicação entre tarefas em processos diferentes no mesmo computador
+
+FIXME
+> texto explicando o código
+> mostrar o código completo
+
+FIXME
+> explicar como foi executado
+> mostrar as saídas do terminal
+> mostrar as saídas do terminal
+
+FIXME
+> se houve problema na execução, enumerar os problemas e suas respectivas soluções
 
 ### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
