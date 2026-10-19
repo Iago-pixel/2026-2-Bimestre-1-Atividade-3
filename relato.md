@@ -285,14 +285,55 @@ Execução:
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
-FIXME
-> texto explicando o código
-> mostrar o código completo
+A linguagem Kotlin, por herdar o ecossistema robusto do Java, realiza a comunicação entre processos diferentes no mesmo computador por meio de um mecanismo chamado ProcessBuilder.
+​No código a seguir, utilizamos os mesmos exemplos da atividade para demonstrar o que seria análogo a essa lógica. O ponto de entrada main utiliza o parâmetro args para decidir qual papel vai desempenhar: quando o programa é iniciado normalmente, sem argumentos, ele assume o papel de processo principal. Quando é iniciado com o argumento produtor, ele assume o papel de subprocesso isolado.
+​Durante a execução do produtor, utiliza-se o ProcessBuilder para abrir uma nova instância da aplicação passando a flag correspondente. Esse subprocesso gera uma lista de dados e imprime o conteúdo em sua saída padrão. O processo principal intercepta a saída do subprocesso através de um fluxo de leitura que funciona exatamente como um pipe, aguarda o término do processo, captura a string com os números gerados, converte-os de volta para uma lista de inteiros, calcula a soma e exibe o resultado final.
 
-FIXME
-> explicar como foi executado
+fun processoProdutor() {
+    val dados = List(100) {
+        Random.nextInt(0, 111)
+    }
+    // Imprime apenas os números separados por vírgula para o pipe ler limpo
+    print(dados.joinToString(","))
+}
+
+fun processoConsumidor(dadosStr: String) {
+    if (dadosStr.isBlank()) return
+    val dados = dadosStr.split(",").map { it.toInt() }
+    val resultado = dados.sum()
+    println("recebeu -> $resultado")
+}
+
+fun main(args: Array<String>) {
+    if (args.isNotEmpty() && args[0] == "produtor") {
+        processoProdutor()
+        return
+    }
+
+    println("iniciou")
+
+    // Configura a chamada do subprocesso em Kotlin/JVM
+    val javaBin = "${System.getProperty("java.home")}/bin/java"
+    val classpath = System.getProperty("java.class.path")
+    val className = {}::class.java.enclosingClass.name
+
+    // Dispara o subprocesso passando o argumento "produtor"
+    val process = ProcessBuilder(javaBin, "-cp", classpath, className, "produtor")
+        .start()
+
+    // Lê os dados que vieram pelo pipe do subprocesso
+    val dadosRecebidos = process.inputStream.bufferedReader().use { it.readText() }
+    process.waitFor()
+
+    // Passa os dados recebidos via pipe para o consumidor
+    processoConsumidor(dadosRecebidos)
+
+    println("finalizou")
+}
+
+
 > mostrar as saídas do terminal
-> mostrar as saídas do terminal
+
 
 FIXME
 > se houve problema na execução, enumerar os problemas e suas respectivas soluções
