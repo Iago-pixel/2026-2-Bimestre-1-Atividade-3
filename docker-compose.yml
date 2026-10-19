@@ -1,0 +1,10 @@
+services:
+  servidor:
+    build: ./servidor
+    container_name: servidor-kotlin
+
+  cliente:
+    build: ./cliente
+    container_name: cliente-kotlin
+    depends_on:
+      - servidor

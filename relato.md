@@ -161,7 +161,7 @@ fun produzirDados(): List<Int> {
 val resultado = dados.sum()
 ```
 
-> Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atirbui a lista a variavel "dados" após isso faz a chamada para afunçaõ seguinte que a realiza a operação já mencionada.
+> Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atribui a lista a variavel "dados" após isso faz a chamada para afunçaõ seguinte que a realiza a operação já mencionada.
 
 
 ##### Ex-2:
@@ -301,92 +301,71 @@ FIXME
 
 #### O código
 
-> O projeto demonstra a comunicação entre dois processos independentes utilizando Kotlin, Docker e TCP Socket.
+> O código desenvolvido tem como objetivo estabelecer uma comunicação entre dois programas escritos em Kotlin, utilizando sockets TCP e executando cada programa em um contêiner Docker separado.
 
-> O Processo A é responsável por gerar uma lista com 100 números aleatórios. Depois, ele cria um Socket e se conecta ao Processo B através da porta 5000. A lista é convertida para texto e enviada pela conexão TCP.
+> O servidor é responsável por escutar conexões na porta 5000 e aguardar a solicitação de um cliente. Quando a conexão é estabelecida, ele envia a mensagem “Bem-vindo ao servidor!” e, em seguida, encerra a conexão. O cliente, por sua vez, conecta-se ao servidor utilizando o nome do serviço definido no Docker Compose, recebe a mensagem enviada, exibe o conteúdo no terminal e fecha a conexão.
 
-> O Processo B funciona como servidor. Ele utiliza ServerSocket(5000) para ficar aguardando uma conexão. Quando o Processo A se conecta, B recebe os dados, transforma a mensagem novamente em uma lista de números e calcula a soma.
+> Para executar os programas, foram criados Dockerfiles individuais, responsáveis por compilar os códigos Kotlin e preparar o ambiente de execução de cada aplicação. Além disso, foi utilizado o Docker Compose para construir as imagens, iniciar os contêineres e permitir a comunicação entre eles por meio de uma rede interna.
 
-> O Docker Compose cria e conecta os dois containers em uma rede interna. Dessa forma, o Processo A consegue encontrar o Processo B pelo nome processo-b.
+> Dessa forma, o exercício demonstrou na prática o funcionamento da comunicação entre processos utilizando sockets TCP, além de apresentar como o Docker permite executar aplicações isoladas que se comunicam pela rede.
 
-> Assim, o projeto mostra como dois processos separados podem trocar informações pela rede sem compartilhar diretamente a memória, simulando a comunicação entre dois computadores.
-
-##### Processo-a
+##### Cliente basico
 
 ```kotlin
 import java.net.Socket
-import kotlin.random.Random
-
-fun produzirDados(): List<Int> {
-    return List(100) {
-        Random.nextInt(0, 111)
-    }
-}
 
 fun main() {
+    val cliente = Socket("servidor", 5000)
 
-    val dados = produzirDados()
+    println("Conectado ao servidor!")
 
-    println("Processo A produziu:")
-    println(dados)
+    val buffer = ByteArray(1024)
+    val quantidade = cliente.getInputStream().read(buffer)
 
-    val socket = Socket("processo-b", 5000)
+    if (quantidade != -1) {
+        val mensagem = String(
+            buffer, 0, quantidade, Charsets.UTF_8
+        )
+        println("Mensagem recebida: $mensagem")
+    }
 
-    println("Processo A: conectado ao Processo B!")
-
-    val mensagem = dados.joinToString(",")
-
-    val writer = socket
-        .getOutputStream()
-        .bufferedWriter()
-
-    writer.write(mensagem)
-    writer.newLine()
-    writer.flush()
-
-    println("Processo A: dados enviados!")
-
-    socket.close()
+    cliente.close()
+    println("Conexão encerrada")
 }
 ```
 
-#### processo-b
+#### Servidor básico
 ```kotlin
 import java.net.ServerSocket
+import java.net.InetAddress
 
 fun main() {
-    val server = ServerSocket(5000)
+    val servidor = ServerSocket(
+        5000,
+        1,
+        InetAddress.getByName("0.0.0.0")
+    )
 
-    println("Processo B: aguardando conexão do Processo A...")
+    println("Servidor escutando na porta 5000")
 
-    val socket = server.accept()
+    val conexao = servidor.accept()
+    println("Cliente conectado!")
 
-    println("Processo B: Processo A conectado!")
+    val mensagem = "Bem-vindo ao servidor!"
+    conexao.getOutputStream().write(
+        mensagem.toByteArray(Charsets.UTF_8)
+    )
 
-    val mensagem = socket
-        .getInputStream()
-        .bufferedReader()
-        .readLine()
+    conexao.close()
+    servidor.close()
 
-    val dados = mensagem
-        .split(",")
-        .map { it.toInt() }
-
-    println("Processo B recebeu:")
-    println(dados)
-
-    val soma = dados.sum()
-
-    println("Soma dos dados: $soma")
-
-    socket.close()
-    server.close()
+    println("Servidor encerrado")
 }
 ```
 
 ### Execução
 
-> A execução do projeto aconteceu através do Docker Compose, que foi responsável por criar e executar os dois processos em containers separados. O Docker executou os dois programas separadamente, enquanto o TCP Socket foi responsável por fazer a comunicação entre eles.
+> A execução foi realizada por meio do comando docker compose up --build, responsável por construir as imagens e iniciar os contêineres do servidor e do cliente Kotlin. Após a inicialização, o servidor passou a escutar na porta 5000 e aguardou a conexão do cliente. Quando a conexão foi estabelecida, o servidor enviou a mensagem de boas-vindas, que foi recebida e exibida no terminal do cliente. Ao final, ambos encerraram a conexão corretamente.
 
 ![Saída do terminal](src/img/ex_codigo_2.png)
 
