@@ -285,10 +285,13 @@ Execução:
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
-A linguagem Kotlin, por herdar o ecossistema robusto do Java, realiza a comunicação entre processos diferentes no mesmo computador por meio de um mecanismo chamado ProcessBuilder.
-​No código a seguir, utilizamos os mesmos exemplos da atividade para demonstrar o que seria análogo a essa lógica. O ponto de entrada main utiliza o parâmetro args para decidir qual papel vai desempenhar: quando o programa é iniciado normalmente, sem argumentos, ele assume o papel de processo principal. Quando é iniciado com o argumento produtor, ele assume o papel de subprocesso isolado.
-​Durante a execução do produtor, utiliza-se o ProcessBuilder para abrir uma nova instância da aplicação passando a flag correspondente. Esse subprocesso gera uma lista de dados e imprime o conteúdo em sua saída padrão. O processo principal intercepta a saída do subprocesso através de um fluxo de leitura que funciona exatamente como um pipe, aguarda o término do processo, captura a string com os números gerados, converte-os de volta para uma lista de inteiros, calcula a soma e exibe o resultado final.
+> A linguagem Kotlin, por herdar o ecossistema robusto do Java, realiza a comunicação entre processos diferentes no mesmo computador por meio de um mecanismo chamado ProcessBuilder.
 
+​> No código a seguir, utilizamos os mesmos exemplos da atividade para demonstrar o que seria análogo a essa lógica. O ponto de entrada main utiliza o parâmetro args para decidir qual papel vai desempenhar: quando o programa é iniciado normalmente, sem argumentos, ele assume o papel de processo principal. Quando é iniciado com o argumento produtor, ele assume o papel de subprocesso isolado.
+
+​> Durante a execução do produtor, utiliza-se o ProcessBuilder para abrir uma nova instância da aplicação passando a flag correspondente. Esse subprocesso gera uma lista de dados e imprime o conteúdo em sua saída padrão. O processo principal intercepta a saída do subprocesso através de um fluxo de leitura que funciona exatamente como um pipe, aguarda o término do processo, captura a string com os números gerados, converte-os de volta para uma lista de inteiros, calcula a soma e exibe o resultado final.
+
+```kotlin
 fun processoProdutor() {
     val dados = List(100) {
         Random.nextInt(0, 111)
@@ -330,6 +333,7 @@ fun main(args: Array<String>) {
 
     println("finalizou")
 }
+```
 
 
 > mostrar as saídas do terminal
@@ -467,9 +471,6 @@ fun main() = runBlocking {
 #### Execução
 
 > Para a execução, o Servidor é iniciado primeiro. Assim que o Cliente se conecta via IP e porta, a transferência de dados ocorre com sucesso.
-
-#### Problemas enfrentados
-> O principal entrave foi o isolamento de rede do Docker, que bloqueia conexões externas por padrão. A solução é usar a flag -p 12345:12345 ao rodar o container para mapear a porta e liberar o acesso.
 
 ## Considerações finais
 > O grupo conseguiu implementar e executar com sucesso todas as atividades, adaptando a lógica de concorrência para as ferramentas nativas do Kotlin.
