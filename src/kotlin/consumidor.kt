@@ -1,36 +1,22 @@
-import kotlinx.coroutines.*
 import kotlin.random.Random
-
-var dados = mutableListOf<Int>()
-
-fun produzirDados() {
-    println("# produzir - iniciado")
-    dados = List(100) { Random.nextInt(0, 111) }.toMutableList()
-    println("# produzir $dados")
-    println("# produzir - terminado")
-}
-
-fun consumirDados() {
-    println("### consumir - iniciado")
-    println("### dados -> $dados")
+fun consumirDados(dados: List<Int>) {
     val resultado = dados.sum()
-    println("### resultado -> $resultado")
-    println("### consumir - terminado")
+    println("recebeu -> $resultado")
 }
 
-fun main() = runBlocking {
+fun principal() {
     println("iniciou")
 
-    val jobProdutor = launch {
-        produzirDados()
-    }
+    val dados_em_texto = readln()
+    val dados: List<Int> = dados_em_texto
+        .split(",")
+        .map { it.toInt() }
 
-    jobProdutor.join()
-
-    val jobConsumidor = launch {
-        consumirDados()
-    }
-    jobConsumidor.join()
+    consumirDados(dados)
 
     println("finalizou")
+}
+
+fun main() {
+    principal()
 }

@@ -1,29 +1,27 @@
+
 FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y wget unzip && \
-    wget https://github.com/JetBrains/kotlin/releases/download/v1.9.23/kotlin-compiler-1.9.23.zip && \
-    unzip kotlin-compiler-1.9.23.zip -d /opt && \
-    rm kotlin-compiler-1.9.23.zip
+RUN apt-get update && apt-get install -y wget unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/opt/kotlinc/bin:${PATH}"
+RUN wget -q https://github.com/JetBrains/kotlin/releases/download/v1.9.23/kotlin-compiler-1.9.23.zip \
+    && unzip -q kotlin-compiler-1.9.23.zip \
+    && rm kotlin-compiler-1.9.23.zip
 
-RUN wget https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.8.1/kotlinx-coroutines-core-jvm-1.8.1.jar
+ENV PATH="/app/kotlinc/bin:${PATH}"
 
-COPY src/kotlin/consumidor.kt .
+COPY src/kotlin/produtor.kt src/kotlin/consumidor.kt ./
 
-RUN kotlinc consumidor.kt \
-    -classpath kotlinx-coroutines-core-jvm-1.8.1.jar \
-    -include-runtime \
-    -d programa.jar
+RUN kotlinc produtor.kt -include-runtime -d produtor.jar
+RUN kotlinc consumidor.kt -include-runtime -d consumidor.jar
 
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/programa.jar .
-COPY --from=builder /app/kotlinx-coroutines-core-jvm-1.8.1.jar .
+COPY --from=builder /app/produtor.jar .
+COPY --from=builder /app/consumidor.jar .
 
-CMD ["java", "-cp", "programa.jar:kotlinx-coroutines-core-jvm-1.8.1.jar", "ConsumidorKt"]
+CMD ["sh", "-c", "java -jar produtor.jar | java -jar consumidor.jar"]

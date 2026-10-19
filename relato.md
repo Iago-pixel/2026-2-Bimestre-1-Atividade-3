@@ -285,62 +285,60 @@ Execução:
 
 ### Comunicação entre tarefas em processos diferentes no mesmo computador
 
-> A linguagem Kotlin, por herdar o ecossistema robusto do Java, realiza a comunicação entre processos diferentes no mesmo computador por meio de um mecanismo chamado ProcessBuilder.
+> O código do pipeline foi desenvolvido para executar dois programas Kotlin, produtor.kt e consumidor.kt, de forma sequencial e integrada. Primeiro, os arquivos são compilados em arquivos .jar por meio do compilador Kotlin no Dockerfile. Em seguida, o comando java -jar produtor.jar | java -jar consumidor.jar utiliza o operador pipe (|) para encaminhar a saída padrão do produtor diretamente para a entrada padrão do consumidor.
 
-​> No código a seguir, utilizamos os mesmos exemplos da atividade para demonstrar o que seria análogo a essa lógica. O ponto de entrada main utiliza o parâmetro args para decidir qual papel vai desempenhar: quando o programa é iniciado normalmente, sem argumentos, ele assume o papel de processo principal. Quando é iniciado com o argumento produtor, ele assume o papel de subprocesso isolado.
-
-​> Durante a execução do produtor, utiliza-se o ProcessBuilder para abrir uma nova instância da aplicação passando a flag correspondente. Esse subprocesso gera uma lista de dados e imprime o conteúdo em sua saída padrão. O processo principal intercepta a saída do subprocesso através de um fluxo de leitura que funciona exatamente como um pipe, aguarda o término do processo, captura a string com os números gerados, converte-os de volta para uma lista de inteiros, calcula a soma e exibe o resultado final.
+##### Produtor
 
 ```kotlin
-fun processoProdutor() {
+import kotlin.random.Random
+
+fun produzirDados(): List<Int> {
     val dados = List(100) {
         Random.nextInt(0, 111)
     }
-    // Imprime apenas os números separados por vírgula para o pipe ler limpo
-    print(dados.joinToString(","))
+
+    return dados
 }
 
-fun processoConsumidor(dadosStr: String) {
-    if (dadosStr.isBlank()) return
-    val dados = dadosStr.split(",").map { it.toInt() }
+fun principal() {
+    val dados = produzirDados()
+    println(dados.joinToString(separator = ","))
+}
+
+fun main() {
+    principal()
+}
+```
+
+##### Consumidor
+```kotlin
+import kotlin.random.Random
+fun consumirDados(dados: List<Int>) {
     val resultado = dados.sum()
     println("recebeu -> $resultado")
 }
 
-fun main(args: Array<String>) {
-    if (args.isNotEmpty() && args[0] == "produtor") {
-        processoProdutor()
-        return
-    }
-
+fun principal() {
     println("iniciou")
 
-    // Configura a chamada do subprocesso em Kotlin/JVM
-    val javaBin = "${System.getProperty("java.home")}/bin/java"
-    val classpath = System.getProperty("java.class.path")
-    val className = {}::class.java.enclosingClass.name
+    val dados_em_texto = readln()
+    val dados: List<Int> = dados_em_texto
+        .split(",")
+        .map { it.toInt() }
 
-    // Dispara o subprocesso passando o argumento "produtor"
-    val process = ProcessBuilder(javaBin, "-cp", classpath, className, "produtor")
-        .start()
-
-    // Lê os dados que vieram pelo pipe do subprocesso
-    val dadosRecebidos = process.inputStream.bufferedReader().use { it.readText() }
-    process.waitFor()
-
-    // Passa os dados recebidos via pipe para o consumidor
-    processoConsumidor(dadosRecebidos)
+    consumirDados(dados)
 
     println("finalizou")
 }
+
+fun main() {
+    principal()
+}
 ```
 
+##### Saida:
 
-> mostrar as saídas do terminal
-
-
-FIXME
-> se houve problema na execução, enumerar os problemas e suas respectivas soluções
+![Saída do terminal](src/img/ex_codigo_3.png)
 
 ### Comunicação entre tarefas em processos diferentes em computadores diferentes
 
