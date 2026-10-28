@@ -421,56 +421,6 @@ fun main() {
 > Para simplificar o projeto e evitar esses problemas, substituímos o Redis por uma comunicação direta utilizando TCP Socket. Assim, o Processo B fica aguardando uma conexão e o Processo A envia diretamente os dados para ele.
 
 ## Considerações finais
-
-> O arquivo `consumidor.kt` utiliza Coroutines (`kotlinx.coroutines`), que são alternativas mais leves às threads, para realizar a comunicação concorrente.
-
-> Uma lista global mutável chamada `dados` é compartilhada. A função `produzirDados` preenche essa lista, e `consumirDados` realiza a soma.
-
-> Na função principal, usamos `runBlocking` e `launch` para disparar as tarefas. O comando `jobProdutor.join()` obriga o consumidor a esperar a produção terminar, evitando erros de leitura antes do tempo.
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlin.random.Random
-
-var dados = mutableListOf<Int>()
-
-fun produzirDados() {
-    println("# produzir - iniciado")
-    dados = List(100) { Random.nextInt(0, 111) }.toMutableList()
-    println("# produzir $dados")
-    println("# produzir - terminado")
-}
-fun consumirDados() {
-    println("### consumir - iniciado")
-    println("### dados -> $dados")
-    val resultado = dados.sum()
-    println("### resultado -> $resultado")
-    println("### consumir - terminado")
-}
-
-fun main() = runBlocking {
-    println("iniciou")
-
-    val jobProdutor = launch {
-        produzirDados()
-    }
-
-    jobProdutor.join()
-
-    val jobConsumidor = launch {
-        consumirDados()
-    }
-    jobConsumidor.join()
-
-    println("finalizou")
-}
-```
-
-#### Execução
-
-> Para a execução, o Servidor é iniciado primeiro. Assim que o Cliente se conecta via IP e porta, a transferência de dados ocorre com sucesso.
-
-## Considerações finais
 > O grupo conseguiu implementar e executar com sucesso todas as atividades, adaptando a lógica de concorrência para as ferramentas nativas do Kotlin.
 
 > O maior aprendizado foi entender o uso de Coroutines e consolidar os conhecimentos em Docker, destacando a técnica de multi-stage build que separou a compilação da execução do projeto.
