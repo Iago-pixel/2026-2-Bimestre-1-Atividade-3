@@ -100,7 +100,7 @@ fun produzirDados(): List<Int> {
 val resultado = dados.sum()
 ```
 
-> Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atirbui a lista a variavel "dados" após isso faz a chamada para afunção seguinte que realiza a operação já mencionada. Ela coloca no terminal o inicio e o fim do processo.
+> Logo após temos a principal função definida como "principal", essa função realiza a chamada da produção de dados e atribui a lista a variavel "dados" após isso faz a chamada para afunção seguinte que realiza a operação já mencionada. Ela coloca no terminal o inicio e o fim do processo.
 
 ```kotlin
 import kotlin.random.Random
